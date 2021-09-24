@@ -11,6 +11,7 @@ from pyhydroquebec.client import HydroQuebecClient
 from pyhydroquebec.consts import REQUESTS_TIMEOUT, HQ_TIMEZONE
 from pyhydroquebec.outputter import output_text, output_influx, output_json
 from pyhydroquebec.mqtt_daemon import MqttHydroQuebec
+from pyhydroquebec.prometheus_server import PrometheusServer
 from pyhydroquebec.__version__ import VERSION
 
 
@@ -173,6 +174,12 @@ def mqtt_daemon():
     """Entrypoint function."""
     dev = MqttHydroQuebec()
     asyncio.run(dev.async_run())
+
+
+def prometheus_server():
+    """Entrypoint function."""
+    server = PrometheusServer()
+    server.run()
 
 
 if __name__ == '__main__':

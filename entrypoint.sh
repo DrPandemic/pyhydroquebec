@@ -2,7 +2,7 @@
 set -e
 
 # Check user and password
-if [ -z "$PYHQ_USER" ] || [ -z "$PYHQ_PASSWORD" ]  && [ "$PYHQ_OUTPUT" != "MQTT" ]
+if [ -z "$PYHQ_USER" ] || [ -z "$PYHQ_PASSWORD" ] && [ "$PYHQ_OUTPUT" != "MQTT" ]
 then
     echo 'Error: No user or password. Set both environnement variables PYHQ_USER and PYHQ_PASSWORD or PYHQ_OUTPUT=MQTT'
     exit 1
@@ -44,6 +44,9 @@ fi
 if [ "$PYHQ_OUTPUT" == "MQTT" ]
 then
     mqtt_pyhydroquebec
+elif [ "$PYHQ_OUTPUT" == "PROMETHEUS" ]
+then
+    prometheus_pyhydroquebec
 else
     pyhydroquebec -u $PYHQ_USER -p $PYHQ_PASSWORD $PYHQ_CMD_OUTPUT $PYHQ_CMD_CONTRACT
 fi

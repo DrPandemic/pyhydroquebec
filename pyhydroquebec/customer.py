@@ -272,12 +272,16 @@ class Customer():
         # We can not use res.json() because the response header are not application/json
         json_res = json.loads(await res.text())
 
-        self._hourly_data[day_str] = {
-                'day_mean_temp': json_res['results'][0]['tempMoyJour'],
-                'day_min_temp': json_res['results'][0]['tempMinJour'],
-                'day_max_temp': json_res['results'][0]['tempMaxJour'],
-                'hours': {},
-                }
+        try:
+            self._hourly_data[day_str] = {
+                    'day_mean_temp': json_res['results'][0]['tempMoyJour'],
+                    'day_min_temp': json_res['results'][0]['tempMinJour'],
+                    'day_max_temp': json_res['results'][0]['tempMaxJour'],
+                    'hours': {},
+                    }
+        except IndexError:
+            self._logger.info(json_res)
+
         tmp_hour_dict = dict((h, {}) for h in range(24))
         for hour, temp in enumerate(json_res['results'][0]['listeTemperaturesHeure']):
             tmp_hour_dict[hour]['average_temperature'] = temp

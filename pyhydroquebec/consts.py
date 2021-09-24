@@ -171,7 +171,7 @@ Total:                  {d[total_consumption]:.2f} kWh
 HOURLY_HEADER = ("""
 Yesterday consumption details
 -----------------------------
-   Hour  | Temperature | Lower price consumption | Higher price consumption | total comsumption
+   Hour  | Temperature | Lower price consumption | Higher price consumption | total consumption
 """)
 
 HOURLY_TPL = ("""  {hour:2d}:00  |"""
