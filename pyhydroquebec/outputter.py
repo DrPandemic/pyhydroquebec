@@ -5,11 +5,12 @@ This module defines the different output functions:
 * influxdb
 * json
 """
+from datetime import datetime, timedelta
 import json
 
 from pyhydroquebec.consts import (OVERVIEW_TPL,
                                   CONSUMPTION_PROFILE_TPL,
-                                  YESTERDAY_TPL, ANNUAL_TPL, HOURLY_HEADER, HOURLY_TPL)
+                                  YESTERDAY_TPL, ANNUAL_TPL, HOURLY_HEADER, HOURLY_TPL, HQ_TIMEZONE)
 
 
 def output_text(customer, show_hourly=False):
@@ -29,42 +30,19 @@ def output_text(customer, show_hourly=False):
             print(HOURLY_TPL.format(d=data, hour=hour))
 
 
-def output_influx(contract):
+def output_influx(customer, yesterday=datetime.now(HQ_TIMEZONE) - timedelta(days=1)):
     """Print data using influxDB format."""
-    raise Exception("FIXME")
-#    # Pop yesterdays data
-#    yesterday_data = contract]['yesterday_hourly_consumption']
-#    del data[contract]['yesterday_hourly_consumption']
-#
-#    # Print general data
-#    out = "pyhydroquebec,contract=" + contract + " "
-#
-#    for index, key in enumerate(data[contract]):
-#        if index != 0:
-#            out = out + ","
-#        if key in ("annual_date_start", "annual_date_end"):
-#            out += key + "=\"" + str(data[contract][key]) + "\""
-#        else:
-#            out += key + "=" + str(data[contract][key])
-#
-#    out += " " + str(int(datetime.datetime.now(HQ_TIMEZONE).timestamp() * 1000000000))
-#    print(out)
-#
-#    # Print yesterday values
-#    yesterday = datetime.datetime.now(HQ_TIMEZONE) - datetime.timedelta(days=1)
-#    yesterday = yesterday.replace(minute=0, hour=0, second=0, microsecond=0)
-#
-#    for hour in yesterday_data:
-#        msg = "pyhydroquebec,contract={} {} {}"
-#
-#        data = ",".join(["{}={}".format(key, value) for key, value in hour.items()
-#                         if key != 'hour'])
-#
-#        datatime = datetime.datetime.strptime(hour['hour'], '%H:%M:%S')
-#        yesterday = yesterday.replace(hour=datatime.hour)
-#        yesterday_str = str(int(yesterday.timestamp() * 1000000000))
-#
-#        print(msg.format(contract, data, yesterday_str))
+    yesterday = yesterday.replace(minute=0, hour=0, second=0, microsecond=0)
+
+    for hour, content in customer.hourly_data[yesterday.strftime("%Y-%m-%d")]['hours'].items():
+        msg = "pyhydroquebec,contract={} {} {}"
+
+        data = ",".join(["{}={}".format(key, value) for key, value in content.items()])
+
+        yesterday = yesterday.replace(hour=hour)
+        yesterday_str = str(int(yesterday.timestamp() * 1000000000))
+
+        print(msg.format(customer.contract_id, data, yesterday_str))
 
 
 def output_json(customer, show_hourly=False):
